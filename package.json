@@ -1,0 +1,43 @@
+{
+  "name": "@teleology/migraine",
+  "version": "0.0.1",
+  "description": "Taking the headache out of db migrations",
+  "main": "lib/index.js",
+  "author": "Chris Sullivan <chrissullivan.dev@gmail.com>",
+  "files": [
+    "lib/*"
+  ],
+  "bin": {
+    "migraine": "lib/index.js"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/teleology-io/teleology-migraine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/teleology-io/teleology-migraine/issues"
+  },
+  "scripts": {
+    "lint": "npx eslint src/",
+    "lint:fix": "yarn lint --fix",
+    "test": "npx jest",
+    "test:coverage": "yarn test --coverage",
+    "prepare": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^18.14.1",
+    "@types/pg": "^8.6.6",
+    "eslint": "^7.6.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-config-teleology": "^1.0.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier": "^2.0.5",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "pg": "^8.9.0"
+  }
+}
