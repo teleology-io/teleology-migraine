@@ -6,6 +6,7 @@ export interface Migration {
 }
 
 export interface MigraineController {
+  migrations: Migration[];
   init: () => Promise<void>;
   up: (unresolved: string[]) => Promise<void>;
   down: (unresolved: string[], dropTable?: boolean) => Promise<void>;

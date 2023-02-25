@@ -13,15 +13,33 @@ import {
 export default class PostgresController implements MigraineController {
   pool: Pool;
 
-  migrationDir: string;
-
   migrations: Migration[] = [];
 
+  migrationDir: string;
+
   constructor(options: PoolConfig & MigraineControllerOptions) {
-    const { migrationDir, ...connectionOptions } = options;
-    
-    this.pool = new Pool(connectionOptions);
+    const {
+      connectionString,
+      host,
+      user,
+      password,
+      database,
+      port,
+      migrationDir,
+    } = options;
+
+    const connectionOptions = connectionString
+      ? { connectionString }
+      : {
+          host,
+          user,
+          password,
+          database,
+          port,
+        };
+
     this.migrationDir = migrationDir;
+    this.pool = new Pool(connectionOptions);
   }
 
   async init() {
@@ -44,8 +62,14 @@ export default class PostgresController implements MigraineController {
         path.resolve(this.migrationDir, `${file}.up.sql`),
         'utf8',
       );
-      await this.pool.query(content);
-      await this.pool.query(`INSERT INTO migraine (name) VALUES ($1);`, [file]);
+      await this.pool.query(content).catch((e) => {
+        throw e;
+      });
+      await this.pool
+        .query(`INSERT INTO migraine (name) VALUES ($1);`, [file])
+        .catch((e) => {
+          throw e;
+        });
     }
   }
 

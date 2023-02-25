@@ -1,0 +1,9 @@
+{
+  "migrationDirectory": "./migrations",
+  "driver": "mysql",
+  "host": "localhost",
+  "user": "mysql",
+  "password": "example",
+  "database": "sample",
+  "port": 3306
+}

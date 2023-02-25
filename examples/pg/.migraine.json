@@ -1,0 +1,9 @@
+{
+  "migrationDirectory": "./migrations",
+  "driver": "pg",
+  "host": "localhost",
+  "user": "postgres",
+  "password": "example",
+  "database": "sample",
+  "port": 5001
+}
