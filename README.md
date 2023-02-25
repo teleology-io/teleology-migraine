@@ -15,13 +15,13 @@ yarn add -D @teleology/migraine
 
 # Usage:
 
-Start off by creating `.migraine.json` configuration file by running the following script:
+Start off by creating a `.migraine.json` configuration file by running the following script:
 
 ```
 migraine init
 ```
 
-This will create a sample configuration for your databases. 
+This will create a sample configuration for your database. 
 
 
 # Commands

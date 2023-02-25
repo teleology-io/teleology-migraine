@@ -1,6 +1,6 @@
 {
   "name": "@teleology/migraine",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Taking the headache out of db migrations",
   "main": "lib/index.js",
   "author": "Chris Sullivan <chrissullivan.dev@gmail.com>",
