@@ -31,6 +31,12 @@ const getController = (config: any): MigraineController => {
     return new PostgresController(config);
   }
 
+  if (config.driver === 'mysql') {
+    const MySqlController = require('./msyql').default;
+
+    return new MySqlController(config);
+  }
+
   throw MISSING_CONTROLLER_ERROR;
 };
 
@@ -44,9 +50,9 @@ const getControllerAndMigrationFiles = async () => {
   const migrationFiles = fs.readdirSync(migrationDir);
 
   return {
+    migrationDir: config.migrationDir,
     migrationFiles,
     controller,
-    config,
   };
 };
 
@@ -101,6 +107,9 @@ const getControllerAndMigrationFiles = async () => {
 
       const { migrationDir } = config;
 
+      console.log({
+        migrationDir,
+      });
       const now = Date.now();
       const filename = args.slice(1).join('_').replace(/ /g, '_').toLowerCase();
       fs.writeFileSync(
@@ -114,7 +123,7 @@ const getControllerAndMigrationFiles = async () => {
       break;
     }
     case 'up': {
-      const { controller, migrationFiles } =
+      const { controller, migrationFiles, migrationDir } =
         await getControllerAndMigrationFiles();
 
       const migrated = controller.migrations

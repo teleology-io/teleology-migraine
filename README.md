@@ -5,6 +5,7 @@ Taking the headache out of db migrations
 
 # Databases:
 - postgres
+- mysql
 - ... @todo more
 
 
