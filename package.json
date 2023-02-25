@@ -1,6 +1,6 @@
 {
   "name": "@teleology/migraine",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Taking the headache out of db migrations",
   "main": "lib/index.js",
   "author": "Chris Sullivan <chrissullivan.dev@gmail.com>",
@@ -40,5 +40,9 @@
     "eslint-plugin-react": "^7.32.2",
     "prettier": "^2.0.5",
     "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "mysql": "^2.18.1",
+    "pg": "^8.9.0"
   }
 }
