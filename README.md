@@ -18,7 +18,7 @@ yarn add -D @teleology/migraine
 Start off by creating `.migraine.json` configuration file by running the following script:
 
 ```
-yarn migraine init
+migraine init
 ```
 
 This will create a sample configuration for your databases. 
@@ -31,7 +31,7 @@ This will create a sample configuration for your databases.
 To view which migrations you already have run:
 
 ```
-yarn migraine show
+migraine show
 ```
 
 ## Create
@@ -39,7 +39,7 @@ yarn migraine show
 Create a `<filename>.up.sql` and `<filename>.down.sql`:
 
 ```
-yarn migraine create <some random name>
+migraine create <some random name>
 ```
 
 *Note: all whitespace and uppercase characters will be converted.
@@ -49,19 +49,19 @@ yarn migraine create <some random name>
 Run ALL migration files not previously ran:
 
 ```
-yarn migraine up
+migraine up
 ```
 
 Run a specific number of up migrations:
 
 ```
-yarn migraine up -c <number>
+migraine up -c <number>
 ```
 
 Run a specific migration file:
 
 ```
-yarn migraine up <filename>
+migraine up <filename>
 ```
 
 *Note: Do not include the `.up.sql` portion of the file name
@@ -72,19 +72,19 @@ yarn migraine up <filename>
 Revert ALL migration files and drop migraine table:
 
 ```
-yarn migraine down
+migraine down
 ```
 
 Revert a specific number of migrations:
 
 ```
-yarn migraine down -c <number>
+migraine down -c <number>
 ```
 
 Revert a specific migration file:
 
 ```
-yarn migraine down <filename>
+migraine down <filename>
 ```
 
 *Note: Do not include the `.down.sql` portion of the file name
