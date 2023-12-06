@@ -1,6 +1,6 @@
 {
   "name": "@teleology/migraine",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "description": "Taking the headache out of db migrations",
   "main": "lib/index.js",
   "author": "Chris Sullivan <chrissullivan.dev@gmail.com>",
@@ -26,6 +26,8 @@
     "prepare": "tsc"
   },
   "devDependencies": {
+    "@types/command-line-args": "^5.2.3",
+    "@types/command-line-usage": "^5.0.4",
     "@types/mysql": "^2.15.21",
     "@types/node": "^18.14.1",
     "@types/pg": "^8.6.6",
@@ -42,6 +44,8 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
+    "command-line-args": "^5.2.1",
+    "command-line-usage": "^7.0.1",
     "mysql": "^2.18.1",
     "pg": "^8.9.0"
   }

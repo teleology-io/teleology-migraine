@@ -1,84 +1,63 @@
 #!/usr/bin/env node
+/* eslint-disable no-underscore-dangle */
 import fs from 'fs';
 import path from 'path';
 
-import { Migration, MigraineController } from './types';
+import { MigraineController, Migration } from './types';
 
-const args = process.argv.slice(2);
+import parse from './args';
+import MySqlController from './msyql';
+import PostgresController from './pg';
 
-const MISSING_CONFIG_ERROR = new Error(
-  `Missing .migraine.json file, please run 'migraine init' to create one`,
-);
+import * as errors from './errors';
 
-const MISSING_CONTROLLER_ERROR = new Error(
-  `Missing controller for provider config`,
-);
+const args = parse();
 
-const getConfig = (): any | Error => {
-  try {
-    return JSON.parse(
-      fs.readFileSync(path.resolve(process.cwd(), '.migraine.json'), 'utf8'),
-    );
-  } catch (e) {
-    throw MISSING_CONFIG_ERROR;
-  }
-};
-
-const getController = (config: any): MigraineController => {
-  if (config.driver === 'pg') {
-    const PostgresController = require('./pg').default;
-
-    return new PostgresController(config);
+const getController = ({
+  migrationDir,
+}: {
+  migrationDir: string;
+}): MigraineController => {
+  if (process.env.DATABASE_URL?.includes('postgres')) {
+    return new PostgresController({
+      connectionString: process.env.DATABASE_URL,
+      migrationDir,
+    });
   }
 
-  if (config.driver === 'mysql') {
-    const MySqlController = require('./msyql').default;
-
-    return new MySqlController(config);
+  if (process.env.DATABASE_URL?.includes('mysql')) {
+    return new MySqlController({
+      connectionString: process.env.DATABASE_URL,
+      migrationDir,
+    });
   }
 
-  throw MISSING_CONTROLLER_ERROR;
-};
-
-const getControllerAndMigrationFiles = async () => {
-  const config = getConfig();
-
-  const controller = getController(config);
-  await controller.init();
-
-  const migrationDir = path.resolve(process.cwd(), config.migrationDir);
-  const migrationFiles = fs.readdirSync(migrationDir);
-
-  return {
-    migrationDir: config.migrationDir,
-    migrationFiles,
-    controller,
-  };
+  throw errors.MISSING_CONTROLLER_ERROR;
 };
 
 (async () => {
-  switch (args[0]) {
-    case 'init': {
-      const sample = {
-        migrationDir: './migrations',
-        driver: 'pg',
-        host: 'localhost',
-        user: 'postgres',
-        password: 'example',
-        database: 'sample',
-        port: 5001,
-      };
-      fs.writeFileSync(
-        path.resolve(process.cwd(), '.migraine.json'),
-        JSON.stringify(sample, null, 2),
-        'utf8',
-      );
-      break;
-    }
-    case 'show': {
-      const { controller, migrationFiles } =
-        await getControllerAndMigrationFiles();
+  try {
+    if (!process.env.DATABASE_URL) throw errors.MISSING_DATABASE_URL_ERROR;
 
+    if (!args.directory) {
+      console.warn(`No migration directory found, defaulting to /migrations`);
+    }
+
+    const migrationDir = path.resolve(
+      process.cwd(),
+      args.directory || 'migrations',
+    );
+
+    if (!fs.existsSync(migrationDir)) {
+      fs.mkdirSync(migrationDir, { recursive: true });
+    }
+
+    const migrationFiles = fs.readdirSync(migrationDir);
+
+    const controller = getController({ migrationDir });
+    await controller.init();
+
+    if (args._unknown?.includes('show')) {
       const migrated = controller.migrations
         .map((it: Migration) => it.name)
         .sort();
@@ -98,18 +77,8 @@ const getControllerAndMigrationFiles = async () => {
         }
       }
       console.log(``);
-
-      break;
     }
-    case 'create': {
-      const config = getConfig();
-      if (config instanceof Error) throw MISSING_CONFIG_ERROR;
-
-      const { migrationDir } = config;
-
-      console.log({
-        migrationDir,
-      });
+    if (args._unknown?.includes('create')) {
       const now = Date.now();
       const filename = args.slice(1).join('_').replace(/ /g, '_').toLowerCase();
       fs.writeFileSync(
@@ -120,12 +89,8 @@ const getControllerAndMigrationFiles = async () => {
         path.resolve(migrationDir, `${now}-${filename}.down.sql`),
         '',
       );
-      break;
     }
-    case 'up': {
-      const { controller, migrationFiles, migrationDir } =
-        await getControllerAndMigrationFiles();
-
+    if (args._unknown?.includes('up')) {
       const migrated = controller.migrations
         .map((it: Migration) => it.name)
         .sort();
@@ -140,22 +105,17 @@ const getControllerAndMigrationFiles = async () => {
       );
 
       // count
-      if (args[1] === '-c') {
-        const count = parseInt(args[2], 10);
-        await controller.up(unresolved.slice(0, count));
-      } else if (args[1]) {
+      if (args.count) {
+        await controller.up(unresolved.slice(0, args.count));
+      } else if (args.migration) {
         await controller.up(
-          unresolved.filter((file) => file.indexOf(args[1]) !== -1),
+          unresolved.filter((file) => file.indexOf(args.migration) !== -1),
         );
       } else {
         await controller.up(unresolved);
       }
-      break;
     }
-    case 'down': {
-      const { controller, migrationFiles } =
-        await getControllerAndMigrationFiles();
-
+    if (args._unknown?.includes('down')) {
       const migrated = controller.migrations
         .map((it) => it.name)
         .sort()
@@ -165,22 +125,20 @@ const getControllerAndMigrationFiles = async () => {
       );
 
       // count
-      if (args[1] === '-c') {
+      if (args.count) {
         const count = parseInt(args[2], 10);
         await controller.down(migrated.slice(0, count));
-      } else if (args[1]) {
+      } else if (args.migration) {
         await controller.down(
-          migrated.filter((file) => file.indexOf(args[1]) !== -1),
+          migrated.filter((file) => file.indexOf(args.migration) !== -1),
         );
       } else {
         await controller.down(migrated, downFiles.length === migrated.length);
       }
-      break;
     }
-    default: {
-      // do nothing
-    }
+  } catch (e) {
+    console.error((e as Error).message);
+  } finally {
+    process.exit(0);
   }
-
-  process.exit(0);
 })();
