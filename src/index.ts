@@ -80,7 +80,11 @@ const getController = ({
     }
     if (args._unknown?.includes('create')) {
       const now = Date.now();
-      const filename = args.slice(1).join('_').replace(/ /g, '_').toLowerCase();
+      const filename = args._unknown
+        .slice(1)
+        .join('_')
+        .replace(/ /g, '_')
+        .toLowerCase();
       fs.writeFileSync(
         path.resolve(migrationDir, `${now}-${filename}.up.sql`),
         '',
